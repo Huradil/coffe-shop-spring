@@ -1,5 +1,6 @@
 package com.example.coffee_shop.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ public class OrderStatus {
     private Long id;
     private String name;
     @OneToMany(mappedBy = "status", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Order> orders;
 
     public OrderStatus() {}

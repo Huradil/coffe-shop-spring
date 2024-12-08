@@ -1,5 +1,6 @@
 package com.example.coffee_shop.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ public class CoffeeShopUserRole {
     @Column(nullable = true)
     private String description;
     @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<CoffeeShopUser> users;
 
     public CoffeeShopUserRole() {}

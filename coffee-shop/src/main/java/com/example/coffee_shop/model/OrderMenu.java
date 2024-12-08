@@ -1,5 +1,6 @@
 package com.example.coffee_shop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -14,9 +15,11 @@ public class OrderMenu {
     private Integer count;
     @ManyToOne
     @JoinColumn(name = "menu_id", nullable = false)
+    @JsonBackReference
     private Menu menu;
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
     public OrderMenu() {}

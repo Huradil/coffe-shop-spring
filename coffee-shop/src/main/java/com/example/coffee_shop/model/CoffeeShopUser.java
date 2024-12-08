@@ -1,5 +1,7 @@
 package com.example.coffee_shop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -15,6 +17,7 @@ public class CoffeeShopUser {
     private String username;
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
+    @JsonBackReference
     private CoffeeShopUserRole role;
     @Column(nullable = false)
     private String password;
@@ -32,6 +35,7 @@ public class CoffeeShopUser {
     @JoinColumn(name = "bonus_id", nullable = true)
     private UserBonus bonus;
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Order> orders;
 
     public CoffeeShopUser() {}

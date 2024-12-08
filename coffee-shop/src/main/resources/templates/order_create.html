@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <style>
+        body {
+            background: url('https://images.prom.ua/760782219_760782219.jpg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        form {
+            background-color: rgba(0, 255, 0, 0.4); /* Ярко-зеленый с прозрачностью */
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        .table {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+<form action="#" th:action="@{/order_create}" method="post">
+    <div class="form-group mb-3">
+        <label for="categoryDropdown" class="font-weight-bold">Категория:</label>
+        <select id="categoryDropdown" class="form-control" onchange="filterMenuByCategory()">
+            <option value="all">- Выберите категорию -</option>
+            <option th:each="category : ${categories}"
+                    th:value="${category.id}"
+                    th:text="${category.name}"></option>
+        </select>
+    </div>
+
+    <br><br>
+
+    <h4 class="font-weight-bold align-middle">Меню</h4>
+    <!-- Меню отображается только после выбора категории -->
+    <table id="menuTable" class="table table-striped " style="display:none;">
+        <thead>
+        <tr>
+            <th scope="col">Выбрать</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Ингредиенты</th>
+            <th scope="col">Описание</th>
+            <th scope="col">Размер</th>
+            <th scope="col">Цена</th>
+        </tr>
+        </thead>
+        <tbody id="menuItems">
+        <!-- Меню будет загружаться динамически -->
+        </tbody>
+    </table>
+
+    <!-- Скрытые поля для отправки выбранных меню -->
+    <input type="hidden" id="selectedMenuIds" name="menuIds" value="">
+
+    <button type="submit" class="btn btn-primary">Заказать</button>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+<script>
+    const selectedItems = {};
+    // Функция для фильтрации меню по выбранной категории
+    function filterMenuByCategory() {
+        var categoryId = document.getElementById('categoryDropdown').value;
+        var menuTable = document.getElementById('menuTable');
+        var menuItemsContainer = document.getElementById('menuItems');
+
+        // Очистим текущие данные
+        menuItemsContainer.innerHTML = '';
+
+        // Покажем таблицу меню
+        if (categoryId !== 'all') {
+            menuTable.style.display = 'block';
+
+            // Получим список блюд для выбранной категории через AJAX
+            fetch('/menus?categoryId=' + categoryId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        data.forEach(menuItem => {
+                            var row = document.createElement('tr');
+                            const isChecked = selectedItems[menuItem.id] ? 'checked' : '';
+                            const countValue = selectedItems[menuItem.id]?.count || 1;
+                            row.innerHTML = `
+                                <td>
+                                    <input type="checkbox"
+                                           value="${menuItem.id}"
+                                           onchange="toggleSelection(this)"
+                                           ${isChecked}>
+                                </td>
+                                <td>
+                                    <input type="number"
+                                           min="1"
+                                           value="${countValue}"
+                                           style="width: 50px; text-align: center;"
+                                           onchange="updateCount(${menuItem.id}, this.value)">
+                                </td>
+                                <td>${menuItem.name}</td>
+                                <td>${menuItem.ingredients}</td>
+                                <td>${menuItem.description}</td>
+                                <td>${menuItem.size}</td>
+                                <td>${menuItem.cost}</td>
+                            `;
+                            menuItemsContainer.appendChild(row);
+                        });
+                    }
+                });
+        } else {
+            // Если категория "all", скрываем таблицу
+            menuTable.style.display = 'none';
+        }
+    }
+
+   function toggleSelection(checkbox) {
+        const itemId = checkbox.value;
+
+        if (checkbox.checked) {
+            selectedItems[itemId] = { count: 1 }; // По умолчанию количество 1
+        } else {
+            delete selectedItems[itemId];
+        }
+
+        updateHiddenInput();
+    }
+
+    function updateCount(itemId, count) {
+        if (selectedItems[itemId]) {
+            selectedItems[itemId].count = parseInt(count, 10);
+        }
+
+        updateHiddenInput();
+    }
+
+    function updateHiddenInput() {
+        const hiddenInput = document.getElementById('selectedMenuIds');
+        hiddenInput.value = JSON.stringify(selectedItems);
+        console.log(hiddenInput.value);
+    }
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.example.coffee_shop.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ public class MenuCategory {
     private String description;
     private LocalDateTime createdAt;
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Menu> menus;
 
     public MenuCategory() {}
