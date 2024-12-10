@@ -1,5 +1,6 @@
 package com.example.coffee_shop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import jakarta.persistence.*;

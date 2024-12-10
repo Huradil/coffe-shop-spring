@@ -21,6 +21,8 @@ public class OrderService {
     private MenuRepository menuRepository;
     @Autowired
     private OrderMenuRepository orderMenuRepository;
+    @Autowired
+    private UserBonusRepository userBonusRepository;
 
     public void createOrder(OrderDto orderDto) {
         CoffeeShopUser user = userRepository.findById(orderDto.getUserId()).orElseThrow();
@@ -41,5 +43,8 @@ public class OrderService {
         }
         order.setTotal_cost(totalPrice);
         orderRepository.save(order);
+        UserBonus userBonus = user.getBonus();
+        userBonus.setAmount(userBonus.getAmount() + totalPrice * 0.1);
+        userBonusRepository.save(userBonus);
     }
 }

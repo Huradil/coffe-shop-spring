@@ -27,6 +27,7 @@ public class SecurityConfig {
             "/login",
             "/logout",
             "/register",
+            "/index"
     };
 
     @Autowired
@@ -40,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(AUTH_WHITELIST).permitAll()  // Разрешаем доступ к белому списку
                         .anyRequest().authenticated())  // Все остальные запросы требуют аутентификации
                 .formLogin(form -> form
-                        .loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/home", true)  // Страница входа
+                        .loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/index", true)  // Страница входа
                         .permitAll())  // Разрешить всем доступ к странице входа
                 .logout(logout -> logout
                         .logoutUrl("/logout")  // Страница выхода

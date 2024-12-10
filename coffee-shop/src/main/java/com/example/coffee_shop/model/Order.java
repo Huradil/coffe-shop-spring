@@ -28,4 +28,18 @@ public class Order {
     private List<OrderMenu> order_menus;
 
     public Order() {}
+
+    public String getMenuNames() {
+        StringBuilder menuNames = new StringBuilder();
+        for (OrderMenu orderMenu : order_menus) {
+            if (orderMenu.getCount() != 1) {
+                menuNames.append(orderMenu.getCount()).append(" x ");
+            }
+            menuNames.append(orderMenu.getMenu().getName()).append(", ");
+        }
+        if (menuNames.length() > 0) {
+            menuNames.setLength(menuNames.length() - 2);
+        }
+        return menuNames.toString();
+    }
 }

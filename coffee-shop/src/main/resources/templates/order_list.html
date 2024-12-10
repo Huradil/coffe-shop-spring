@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица заказов</title>
+    <!-- Подключаем Bootstrap для стилизации -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <style>
+        body {
+            background: url('https://images.prom.ua/760782219_760782219.jpg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            color: #f7f7fd;
+            text-align: center;
+            margin-top: 20px;
+        }
+        table {
+            margin: 30px auto;
+            width: 90%;
+            background: rgba(250, 185, 185, 0.8);
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .status-active {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-awaiting {
+            background-color: #ffc107;
+            color: white;
+        }
+        .status-ready {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-custom {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Таблица заказов для администраторов</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Номер заказа</th>
+        <th>Имя клиента</th>
+        <th>Заказ</th>
+        <th>Общая стоимость</th>
+        <th>статус</th>
+        <th>Управление</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}" th:id="'order' + ${order.id}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customer.username}"></td>
+        <td th:text="${order.menuNames}"></td>
+        <td th:text="${order.total_cost}"></td>
+        <td th:text="${order.status.name}"></td>
+        <td>
+            <button class="btn btn-info btn-custom"
+                    data-toggle="modal"
+                    data-target="#statusModal"
+                    th:data-order-id="${order.id}">
+                Изменить статус
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Изменить статус</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Форма для изменения статуса -->
+                <form id="statusForm" action="/admin/order/status_change" method="post">
+                    <input type="hidden" id="orderIdInput" name="orderId">
+                    <div class="form-group">
+                        <label for="status">Выберите новый статус</label>
+                        <select class="form-control" id="status" name="statusName">
+                            <option th:each="status : ${statuses}"
+                                    th:value="${status.name}"
+                                    th:text="${status.name}">
+                            </option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="saveStatusButton">Сохранить изменения</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+<script>
+    // Когда модальное окно открывается
+     $('#statusModal').on('show.bs.modal', function (event) {
+         // Получаем кнопку, которая вызвала модальное окно
+         var button = $(event.relatedTarget); // Кнопка, которая вызвала модальное окно
+         var orderId = button.data('order-id'); // Извлекаем order.id из data-атрибута
+
+         // Можно передать id в скрытое поле модального окна или использовать его как угодно
+         var modal = $(this);
+         modal.find('#orderIdInput').val(orderId); // Заполняем скрытое поле #orderIdInput
+     });
+</script>
+
+</body>
+</html>

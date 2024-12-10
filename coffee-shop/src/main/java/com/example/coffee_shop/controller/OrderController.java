@@ -1,9 +1,10 @@
 package com.example.coffee_shop.controller;
 
 import com.example.coffee_shop.dto.OrderDto;
-import com.example.coffee_shop.model.Menu;
-import com.example.coffee_shop.model.MenuCategory;
+import com.example.coffee_shop.model.*;
 import com.example.coffee_shop.repository.MenuCategoryRepository;
+import com.example.coffee_shop.repository.OrderRepository;
+import com.example.coffee_shop.repository.OrderStatusRepository;
 import com.example.coffee_shop.repository.UserRepository;
 import com.example.coffee_shop.service.OrderService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,6 +35,10 @@ public class OrderController {
     private OrderService orderService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
 
     @GetMapping("/order")
     public String oderCreateForm(Model model){
@@ -77,5 +82,31 @@ public class OrderController {
     public List<Menu> getMenuByCategory(@RequestParam Long categoryId){
         MenuCategory category = menuCategoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
         return category.getMenus();
+    }
+
+    @GetMapping("/order_list")
+    public String orderList(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (username == null) {
+            throw new RuntimeException("User not found");
+        }
+        CoffeeShopUser user = userRepository.findByUsername(username);
+        if (!user.getRole().getName().equalsIgnoreCase("admin")){
+            return "redirect:/permission_denied";
+        }
+        model.addAttribute("orders", orderRepository.findAll());
+        model.addAttribute("statuses", orderStatusRepository.findAll());
+        return "order_list";
+    }
+
+
+    @PostMapping("/admin/order/status_change")
+    public String orderStatusChange(@RequestParam("orderId") Long orderId, @RequestParam("statusName") String statusName) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        OrderStatus status = orderStatusRepository.findByName(statusName);
+        order.setStatus(status);
+        orderRepository.save(order);
+        return "redirect:/order_list";
     }
 }

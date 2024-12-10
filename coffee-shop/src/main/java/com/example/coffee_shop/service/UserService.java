@@ -2,6 +2,8 @@ package com.example.coffee_shop.service;
 
 
 import com.example.coffee_shop.model.CoffeeShopUser;
+import com.example.coffee_shop.model.UserBonus;
+import com.example.coffee_shop.repository.UserBonusRepository;
 import com.example.coffee_shop.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,15 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserBonusRepository userBonusRepository;
 
     public void createUser(CoffeeShopUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        UserBonus userBonus = new UserBonus();
+        userBonus.setUser(user);
+        userBonusRepository.save(userBonus);
     }
 
     @Override
