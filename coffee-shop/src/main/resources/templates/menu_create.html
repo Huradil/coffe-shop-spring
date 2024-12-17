@@ -73,10 +73,70 @@
                 font-size: 0.9rem;
             }
         }
+              /* Навигация */
+        .navbar {
+            background-color: #000000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff;
+            font-weight: bold;
+            padding: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ff6347;
+        }
+
+        .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffffff;
+            transition: color 0.3s ease;
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+
+        .navbar-brand:hover {
+            color: #ff6347; /* Color when hovered */
+        }
     </style>
 </head>
 
 <body>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">CoffeShop</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/index">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/order">Заказать</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user_detail">Личный кабинет</a>
+                </li>
+                <li class="nav-item" th:if="${role == 'admin'}">
+                    <a class="nav-link" href="/order_list">Заказы(админка)</a>
+                </li>
+                <li class="nav-item" th:if="${role == 'admin'}">
+                    <a class="nav-link" href="/menu_create">Меню(админка)</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <h2>Создание объекта меню</h2>
 
 <form id="menuForm" action="/menu_create" method="post">

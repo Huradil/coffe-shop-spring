@@ -151,13 +151,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Главная</a>
+                    <a class="nav-link" href="/index">Главная</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Войти</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/order">Заказать</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user_detail">Личный кабинет</a>
                 </li>
                 <li class="nav-item" th:if="${role == 'admin'}">
                     <a class="nav-link" href="/order_list">Заказы(админка)</a>
