@@ -2,10 +2,7 @@ package com.example.coffee_shop.controller;
 
 import com.example.coffee_shop.dto.OrderDto;
 import com.example.coffee_shop.model.*;
-import com.example.coffee_shop.repository.MenuCategoryRepository;
-import com.example.coffee_shop.repository.OrderRepository;
-import com.example.coffee_shop.repository.OrderStatusRepository;
-import com.example.coffee_shop.repository.UserRepository;
+import com.example.coffee_shop.repository.*;
 import com.example.coffee_shop.service.OrderService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +36,8 @@ public class OrderController {
     private OrderRepository orderRepository;
     @Autowired
     private OrderStatusRepository orderStatusRepository;
+    @Autowired
+    private UserBonusRepository userBonusRepository;
 
     @GetMapping("/order")
     public String oderCreateForm(Model model){
@@ -73,7 +72,7 @@ public class OrderController {
             e.printStackTrace();
             return "redirect:/order";
         }
-        return "redirect:/order";
+        return "redirect:/user_detail";
     }
 
 
@@ -108,5 +107,26 @@ public class OrderController {
         order.setStatus(status);
         orderRepository.save(order);
         return "redirect:/order_list";
+    }
+
+    @PostMapping("/cancel_order")
+    public String cancelOrder(@RequestParam("orderId") Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        OrderStatus status = orderStatusRepository.findByName("Canceled");
+        order.setStatus(status);
+        orderRepository.save(order);
+        return "redirect:/user_detail";
+    }
+
+    @PostMapping("/use_bonus")
+    public String useBonus(@RequestParam("orderId") Long orderId, @RequestParam("bonusAmount") Double bonusAmount) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setTotal_cost(order.getTotal_cost() - bonusAmount);
+        orderRepository.save(order);
+        CoffeeShopUser user = order.getCustomer();
+        UserBonus userBonus = userBonusRepository.findByUser(user);
+        userBonus.setAmount(userBonus.getAmount() - bonusAmount);
+        userBonusRepository.save(userBonus);
+        return "redirect:/user_detail";
     }
 }

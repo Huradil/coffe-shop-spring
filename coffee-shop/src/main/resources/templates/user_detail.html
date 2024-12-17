@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Детальный просмотр пользователя</title>
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <style>
         body {
@@ -23,7 +22,6 @@
 
         .detail-container {
             max-width: 500px;
-            margin: 50px auto;
             padding: 20px;
             background: rgba(250, 185, 185, 0.8);
             border-radius: 8px;
@@ -46,7 +44,26 @@
             border-radius: 5px;
             font-weight: bold;
         }
-              /* Навигация */
+
+        /* Контейнер для выравнивания деталей и таблицы */
+        .detail-wrapper {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Таблица справа */
+        .order-table {
+            flex: 1;
+            max-width: 500px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+        }
+
         .navbar {
             background-color: #000000;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -68,11 +85,11 @@
             font-weight: bold;
             color: #ffffff;
             transition: color 0.3s ease;
-            cursor: pointer; /* Pointer cursor on hover */
+            cursor: pointer;
         }
 
         .navbar-brand:hover {
-            color: #ff6347; /* Color when hovered */
+            color: #ff6347;
         }
     </style>
 </head>
@@ -86,56 +103,81 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/index">Главная</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Войти</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/order">Заказать</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user_detail">Личный кабинет</a>
-                </li>
-                <li class="nav-item" th:if="${role == 'admin'}">
-                    <a class="nav-link" href="/order_list">Заказы(админка)</a>
-                </li>
-                <li class="nav-item" th:if="${role == 'admin'}">
-                    <a class="nav-link" href="/menu_create">Меню(админка)</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/index">Главная</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login">Войти</a></li>
+                <li class="nav-item"><a class="nav-link" href="/order">Заказать</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user_detail">Личный кабинет</a></li>
+                <li class="nav-item" th:if="${role == 'admin'}"><a class="nav-link" href="/order_list">Заказы(админка)</a></li>
+                <li class="nav-item" th:if="${role == 'admin'}"><a class="nav-link" href="/menu_create">Меню(админка)</a></li>
             </ul>
         </div>
     </div>
 </nav>
+
 <h2 class="text-center mt-5">Детальный просмотр пользователя</h2>
 
-<div class="detail-container">
-    <div class="detail-field">
-        <span class="detail-label">Имя пользователя:</span>
-        <span id="username" th:text="${user.username}">example_user</span>
+<div class="detail-wrapper">
+    <!-- Детали пользователя -->
+    <div class="detail-container">
+        <div class="detail-field">
+            <span class="detail-label">Имя пользователя:</span>
+            <span id="username" th:text="${user.username}">example_user</span>
+        </div>
+        <div class="detail-field">
+            <span class="detail-label">Имя:</span>
+            <span id="first_name" th:text="${user.first_name}">Иван</span>
+        </div>
+        <div class="detail-field">
+            <span class="detail-label">Фамилия:</span>
+            <span id="last_name" th:text="${user.last_name}">Иванов</span>
+        </div>
+        <div class="detail-field">
+            <span class="detail-label">Телефон:</span>
+            <span id="phone_number" th:text="${user.phone_number}">+7 123 456 78 90</span>
+        </div>
+        <div class="detail-field">
+            <span class="detail-label">Адрес:</span>
+            <span id="address" th:text="${user.address}">г. Москва, ул. Пушкина, д. 1</span>
+        </div>
+        <div class="detail-field highlighted-field">
+            <span class="detail-label">Количество бонусов:</span>
+            <span id="bonus_points" th:text="${bonusAmount}">1200</span>
+        </div>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#editModal">Редактировать</button>
     </div>
-    <div class="detail-field">
-        <span class="detail-label">Имя:</span>
-        <span id="first_name" th:text="${user.first_name}">Иван</span>
+
+    <!-- Таблица заказов -->
+    <div class="order-table">
+        <h4>Список заказов</h4>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Заказ</th>
+                <th>Сумма</th>
+                <th>Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}" th:id="'order' + ${order.id}">
+                <td th:text="${order.menuNames}"></td>
+                <td th:text="${order.total_cost}"></td>
+                <td>
+                    <form th:action="@{/cancel_order}" method="post">
+                        <input type="hidden" th:name="orderId" th:value="${order.id}"/>
+                        <button type="submit" class="btn btn-danger">Отменить</button>
+                    </form>
+
+                    <button class="btn btn-success" data-toggle="modal" data-target="#bonusModal"
+                            th:data-order-id="${order.id}"
+                            th:data-bonus-amount="${bonusAmount}"
+                            th:data-total-cost="${order.total_cost}">
+                        Использовать бонусы
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="detail-field">
-        <span class="detail-label">Фамилия:</span>
-        <span id="last_name" th:text="${user.last_name}">Иванов</span>
-    </div>
-    <div class="detail-field">
-        <span class="detail-label">Телефон:</span>
-        <span id="phone_number" th:text="${user.phone_number}">+7 123 456 78 90</span>
-    </div>
-    <div class="detail-field">
-        <span class="detail-label">Адрес:</span>
-        <span id="address" th:text="${user.address}">г. Москва, ул. Пушкина, д. 1</span>
-    </div>
-    <div class="detail-field highlighted-field">
-        <span class="detail-label">Количество бонусов:</span>
-        <span id="bonus_points" th:text="${bonusAmount}">1200</span>
-    </div>
-    <button class="btn btn-primary" data-toggle="modal" data-target="#editModal">Редактировать</button>
 </div>
 
 <!-- Модальное окно -->
@@ -178,7 +220,84 @@
     </div>
 </div>
 
+
+<!-- Модальное окно для ввода суммы бонусов -->
+<div class="modal fade" id="bonusModal" tabindex="-1" aria-labelledby="bonusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bonusModalLabel">Использование бонусов</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bonusForm" action="/use_bonus" method="post">
+                    <div class="mb-3">
+                        <label for="bonusAmountInput" class="form-label">Введите сумму бонусов:</label>
+                        <input type="number" class="form-control" id="bonusAmountInput" min="1" name="bonusAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <span id="errorMessage" class="text-danger" style="display: none;">Сумма бонусов не может превышать доступный баланс.</span>
+                    </div>
+                    <input type="hidden" id="orderId" name="orderId" value="">
+                    <input type="hidden" id="availableBonus" name="availableBonus" value="">
+                    <input type="hidden" id="totalCost" name="totalCost" value="">
+                    <button type="submit" class="btn btn-primary">Применить бонусы</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+<script>
+    // Обработчик для открытия модального окна и установки значений
+document.addEventListener('DOMContentLoaded', function () {
+    const bonusButtons = document.querySelectorAll('.btn-success[data-toggle="modal"]');
+
+    bonusButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Получаем данные из кнопки
+            const orderId = button.getAttribute('data-order-id');
+            const availableBonus = button.getAttribute('data-bonus-amount');
+            const totalCost = button.getAttribute('data-total-cost');
+
+            // Устанавливаем значения в модальном окне
+            document.getElementById('orderId').value = orderId;
+            document.getElementById('availableBonus').value = availableBonus;
+            document.getElementById('totalCost').value = totalCost;
+
+            // Очищаем поле ввода и скрываем ошибку
+            document.getElementById('bonusAmountInput').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+        });
+    });
+
+    // Обработчик отправки формы с бонусами
+    document.getElementById('bonusForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const bonusAmountInput = document.getElementById('bonusAmountInput');
+        const availableBonus = parseFloat(document.getElementById('availableBonus').value);
+        const totalCost = parseFloat(document.getElementById('totalCost').value);
+        const enteredAmount = parseFloat(bonusAmountInput.value);
+
+        // Проверка на максимальное значение бонусов
+        if (enteredAmount > availableBonus || enteredAmount > totalCost) {
+            document.getElementById('errorMessage').style.display = 'block';
+        } else {
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Отправка формы (можно использовать AJAX для отправки без перезагрузки страницы)
+            this.submit();
+        }
+    });
+});
+
+</script>
 </body>
 </html>

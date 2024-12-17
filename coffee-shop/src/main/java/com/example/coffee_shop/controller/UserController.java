@@ -2,7 +2,10 @@ package com.example.coffee_shop.controller;
 
 import com.example.coffee_shop.model.CoffeeShopUser;
 import com.example.coffee_shop.model.CoffeeShopUserRole;
+import com.example.coffee_shop.model.OrderStatus;
 import com.example.coffee_shop.model.UserBonus;
+import com.example.coffee_shop.repository.OrderRepository;
+import com.example.coffee_shop.repository.OrderStatusRepository;
 import com.example.coffee_shop.repository.UserRepository;
 import com.example.coffee_shop.repository.UserRoleRepository;
 import com.example.coffee_shop.service.UserService;
@@ -27,6 +30,10 @@ public class UserController {
     private UserRoleRepository userRoleRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -78,6 +85,8 @@ public class UserController {
         } else {
             bonusAmount = 0.0;
         }
+        OrderStatus status = orderStatusRepository.findByName("Created");
+        model.addAttribute("orders", orderRepository.findByCustomerAndStatus(user, status));
         model.addAttribute("bonusAmount", bonusAmount);
         model.addAttribute("user", user);
         return "user_detail";
